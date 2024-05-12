@@ -12,7 +12,7 @@ class Process:
     def __init__(self):
         self.images_to_process: List[str] = []
 
-        self.proces_flow: List[ProcessStage] = [ImageLoader()]
+        self.proces_flow: List[ProcessStage] = [ImageLoader(viz=True)]
 
     def read_image(self, image: str) -> None:
         self.images_to_process.append(os.path.abspath(image))
@@ -56,12 +56,19 @@ class ProcessStage(ABC):
 
 
 class ImageLoader(ProcessStage):
-    def __init__(self):
+    def __init__(self, viz=False):
         super().__init__()
+        self.viz = viz
 
     def process(self, input: str) -> Tuple[Optional[np.ndarray], bool]:
         if os.path.exists(input):
-            return cv2.imread(input), True
+            img = cv2.imread(input)
+
+            if self.viz:
+                cv2.imshow("Image", img)
+                cv2.waitKey()
+
+            return img, True
 
         return None, False
 
